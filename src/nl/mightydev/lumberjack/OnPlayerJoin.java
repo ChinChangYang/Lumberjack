@@ -10,19 +10,22 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class OnPlayerJoin implements Listener {
-	
+
 	public static OnPlayerJoin instance = new OnPlayerJoin();
 
 	@EventHandler
-	public void onPlayerJoin(PlayerJoinEvent event) {
-		
-		if(LumberjackConfiguration.showLoginMessage() == false) return;
-		
+	public void onPlayerJoin(
+			PlayerJoinEvent event) {
+
+		if (LumberjackConfiguration.showLoginMessage() == false)
+			return;
+
 		Player p = event.getPlayer();
 		PlayerData d = PlayerData.get(p);
-		
-		String s = d.enabled() ? Message.good("enabled") : Message.bad("disabled");
+
+		String s = d.enabled() ? Message.good("enabled") : Message
+				.bad("disabled");
 		Message.send(p, "Lumberjack loaded and " + s);
-		
+
 	}
 }

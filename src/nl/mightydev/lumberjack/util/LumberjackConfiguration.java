@@ -13,9 +13,9 @@ import nl.mightydev.lumberjack.Plugin;
 public abstract class LumberjackConfiguration {
 	
 	private static boolean enabled = true;
-	private static boolean show_login_message = true;
-	private static boolean silent = false;
-	private static boolean mcMMO = true;
+	private static boolean show_login_message = false;
+	private static boolean silent = true;
+	private static boolean mcMMO = false;
 	private static boolean break_full = false;
 	
 	public static boolean enabledByDefault() {
