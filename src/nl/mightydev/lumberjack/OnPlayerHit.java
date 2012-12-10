@@ -12,16 +12,18 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockListener;
 import org.bukkit.inventory.ItemStack;
 
-public class OnPlayerHit extends BlockListener {
+public class OnPlayerHit implements Listener {
 	
 	private Random random = new Random();
 	
 	public final static OnPlayerHit instance = new OnPlayerHit();
-	
+
+	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
 		if(event.isCancelled()) return;
 		

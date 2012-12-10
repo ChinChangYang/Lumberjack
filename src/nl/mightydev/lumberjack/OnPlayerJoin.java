@@ -5,13 +5,15 @@ import nl.mightydev.lumberjack.util.LumberjackConfiguration;
 import nl.mightydev.lumberjack.util.Message;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerListener;
 
-public class OnPlayerJoin extends PlayerListener {
+public class OnPlayerJoin implements Listener {
 	
 	public static OnPlayerJoin instance = new OnPlayerJoin();
-	
+
+	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent event) {
 		
 		if(LumberjackConfiguration.showLoginMessage() == false) return;

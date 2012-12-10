@@ -11,7 +11,6 @@ import nl.mightydev.version.LumberjackVersion;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,8 +35,8 @@ public class Plugin extends JavaPlugin {
 		
 		manager = this.getServer().getPluginManager();
 		
-		manager.registerEvent(Event.Type.BLOCK_BREAK, OnPlayerHit.instance, Event.Priority.Normal, this);
-		manager.registerEvent(Event.Type.PLAYER_JOIN, OnPlayerJoin.instance, Event.Priority.Normal, this);
+		manager.registerEvents(OnPlayerHit.instance, this);
+		manager.registerEvents(OnPlayerJoin.instance, this);
 		
 		File data_folder = getDataFolder();
 		
