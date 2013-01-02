@@ -124,7 +124,7 @@ public class OnPlayerHit implements Listener {
 		// artificial item drop
 		Material material = block.getType();
 		int amount = 1;
-		byte data = block.getData();
+		byte data = (byte) (3 & block.getData());
 		short damage = 0;
 		ItemStack drop = new ItemStack(material, amount, damage, data);
 		block.getWorld().dropItemNaturally(block.getLocation(), drop);
