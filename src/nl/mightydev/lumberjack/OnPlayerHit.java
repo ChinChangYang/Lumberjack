@@ -32,7 +32,7 @@ public class OnPlayerHit implements Listener {
 		if(Plugin.manager.isPluginEnabled("mcMMO") && LumberjackConfiguration.mcMMOCheck()) {
 			try {
 				ClassLoader cl = Plugin.manager.getPlugin("mcMMO").getClass().getClassLoader();
-				Class<?> c = Class.forName("com.gmail.nossr50.datatypes.FakeBlockBreakEvent", false, cl);
+				Class<?> c = Class.forName("com.gmail.nossr50.events.fake.FakeBlockBreakEvent", false, cl);
 				if(c.isInstance(event)) return;
 			} catch (ClassNotFoundException e) {
 				PluginMessage.send("mcMMO's FakeBlockBreakEvent class not found, path might have been changed, contact Lumberjack author!");
