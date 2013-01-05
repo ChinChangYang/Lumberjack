@@ -77,6 +77,8 @@ public class OnPlayerHit implements Listener {
 			if(block.getLocation().equals(highest.getLocation())) {
 				return;
 			}
+			
+			Message.send(player, "Highest type: " + highest.getType().toString()); // debug
 			fakeBlockBreak(highest, player, block.getLocation());
 			event.setCancelled(true);
 		}		
@@ -97,6 +99,7 @@ public class OnPlayerHit implements Listener {
 	
 	private boolean fakeBlockBreak(Block block, Player player, Location breakLocation) {
 
+		Message.send(player, "block type: " + block.getType().toString()); // debug
 		BlockBreakEvent break_event = new LumberjackBlockBreakEvent(block, player);
 		Plugin.manager.callEvent(break_event);
 		if(break_event.isCancelled()) return false;
@@ -122,6 +125,8 @@ public class OnPlayerHit implements Listener {
 		Location playerLocation = player.getLocation();
 		Location dropLocation = playerLocation.add(breakLocation).multiply(0.5);
 		dropLocation.setY(breakLocation.getY());
+
+		Message.send(player, "dropItem type: " + dropItem.getType().toString()); // debug
 		block.getWorld().dropItemNaturally(dropLocation, dropItem);
 		
 		// destroy highest block
