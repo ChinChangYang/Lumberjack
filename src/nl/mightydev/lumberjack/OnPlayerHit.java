@@ -8,6 +8,7 @@ import nl.mightydev.lumberjack.util.Message;
 import nl.mightydev.lumberjack.util.PluginMessage;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -64,7 +65,7 @@ public class OnPlayerHit implements Listener {
 				if(block.getLocation().equals(highest.getLocation())) {
 					continue;
 				}
-				fakeBlockBreak(highest, player);
+				fakeBlockBreak(highest, player, block.getLocation());
 			}
 		}
 		else {
@@ -75,7 +76,7 @@ public class OnPlayerHit implements Listener {
 			if(block.getLocation().equals(highest.getLocation())) {
 				return;
 			}
-			fakeBlockBreak(highest, player);
+			fakeBlockBreak(highest, player, block.getLocation());
 		}
 		
 		event.setCancelled(true);
@@ -94,7 +95,7 @@ public class OnPlayerHit implements Listener {
 		}
 	}
 	
-	private boolean fakeBlockBreak(Block block, Player player) {
+	private boolean fakeBlockBreak(Block block, Player player, Location dropLocation) {
 
 		BlockBreakEvent break_event = new LumberjackBlockBreakEvent(block, player);
 		Plugin.manager.callEvent(break_event);
@@ -111,8 +112,8 @@ public class OnPlayerHit implements Listener {
 		int amount = 1;
 		byte data = (byte) (3 & block.getData());
 		short damage = 0;
-		ItemStack drop = new ItemStack(material, amount, damage, data);
-		block.getWorld().dropItemNaturally(block.getLocation(), drop);
+		ItemStack dropItem = new ItemStack(material, amount, damage, data);
+		block.getWorld().dropItemNaturally(dropLocation, dropItem);
 		
 		// destroy highest block
 		block.setData((byte)0);
