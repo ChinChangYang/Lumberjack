@@ -27,10 +27,15 @@ public class OnPlayerHit implements Listener {
 	public void onBlockBreak(BlockBreakEvent event) {
 		
 		Block block = event.getBlock();
+		Player player = event.getPlayer();
+		PlayerData data = PlayerData.get(player);
+		World world = block.getWorld();
 		
 		if(event.isCancelled()) return;		
 		if(event instanceof LumberjackBlockBreakEvent) return;		
 		if(block.getType() != Material.LOG) return;	
+		if(player.getGameMode() != GameMode.SURVIVAL) return;
+		if(!data.enabled()) return;
 
 		// mcMMO support
 		if(Plugin.manager.isPluginEnabled("mcMMO") && LumberjackConfiguration.mcMMOCheck()) {
@@ -42,14 +47,35 @@ public class OnPlayerHit implements Listener {
 				PluginMessage.send("mcMMO's FakeBlockBreakEvent class not found, path might have been changed, contact Lumberjack author!");
 			}
 		}
+
+		MinecraftTree tree = MinecraftTree.getInstance(world, block, data);			
+		if(!tree.isNatural()) return;
+	
+		if (data.silent() == false) {
+			if (random.nextInt(8) > 0) {
+				String message = getRandomMessage();
+				Message.send(player, message);
+			}
+		}
 		
-		Player player = event.getPlayer();
-		PlayerData data = PlayerData.get(player);
-		
-		if(player.getGameMode() == GameMode.SURVIVAL && data.enabled()) {
+		if(LumberjackConfiguration.breakFull()) {
+			Block highest;
+			while((highest = tree.removeTrunkTop()) != null) {
+				if(block.getLocation().equals(highest.getLocation())) {
+					continue;
+				}
+				fakeBlockBreak(highest, player);
+			}
+		}
+		else {
+			Block highest = tree.removeTrunkTop();
 			
-			boolean cancel = doActions(player, data, block);
-			event.setCancelled(cancel);
+			// no more blocks in tree
+			if(highest == null) return;
+			if(block.getLocation().equals(highest.getLocation())) {
+				return;
+			}
+			fakeBlockBreak(highest, player);
 		}
 	}
 	
@@ -64,44 +90,6 @@ public class OnPlayerHit implements Listener {
 			case 6: return "Who needs an axe if you've got hands?";
 			default: return "Who needs a hammer if you've got a workbe.. wait what?";
 		}
-	}
-	
-	private boolean doActions(Player p, PlayerData d, Block b) {
-
-		World world = b.getWorld();
-		MinecraftTree tree = MinecraftTree.getInstance(world, b, d); 
-			
-		if(tree.isNatural() == false) return false;
-	
-		if (d.silent() == false) {
-			if (random.nextInt(8) > 0) {
-				String message = getRandomMessage();
-				Message.send(p, message);
-			}
-		}
-		
-		if(LumberjackConfiguration.breakFull()) {
-			Block highest;
-			while((highest = tree.removeTrunkTop()) != null) {
-				if(b.getLocation().equals(highest.getLocation())) {
-					continue;
-				}
-				fakeBlockBreak(highest, p);
-			}
-			return false; // don't cancel the event
-		}
-		else {
-			Block highest = tree.removeTrunkTop();
-			
-			// no more blocks in tree
-			if(highest == null) return false;
-			if(b.getLocation().equals(highest.getLocation())) {
-				return false; // don't cancel, natural flow
-			}
-			fakeBlockBreak(highest, p);
-		}
-		
-		return true; // cancel the breaking of the current block
 	}
 	
 	private boolean fakeBlockBreak(Block block, Player player) {
