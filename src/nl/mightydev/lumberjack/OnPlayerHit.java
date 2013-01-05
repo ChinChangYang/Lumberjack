@@ -8,9 +8,11 @@ import nl.mightydev.lumberjack.util.Message;
 import nl.mightydev.lumberjack.util.PluginMessage;
 
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,10 +27,19 @@ public class OnPlayerHit implements Listener {
 
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
-		if(event.isCancelled()) return;
 		
-		if(event instanceof LumberjackBlockBreakEvent) return;
+		Block block = event.getBlock();
+		Player player = event.getPlayer();
+		PlayerData data = PlayerData.get(player);
+		World world = block.getWorld();
+		
+		if(event.isCancelled()) return;		
+		if(event instanceof LumberjackBlockBreakEvent) return;		
+		if(block.getType() != Material.LOG) return;	
+		if(player.getGameMode() != GameMode.SURVIVAL) return;
+		if(!data.enabled()) return;
 
+		// mcMMO support
 		if(Plugin.manager.isPluginEnabled("mcMMO") && LumberjackConfiguration.mcMMOCheck()) {
 			try {
 				ClassLoader cl = Plugin.manager.getPlugin("mcMMO").getClass().getClassLoader();
@@ -38,78 +49,53 @@ public class OnPlayerHit implements Listener {
 				PluginMessage.send("mcMMO's FakeBlockBreakEvent class not found, path might have been changed, contact Lumberjack author!");
 			}
 		}
-		
-		Player p = event.getPlayer();
-		PlayerData d = PlayerData.get(p);
-		
-		if(p.getGameMode() == GameMode.SURVIVAL && d.enabled()) {
-			boolean cancel = doActions(p, d, event.getBlock());
-			event.setCancelled(cancel);
-		}
-	}
-	
-	private boolean doActions(Player p, PlayerData d, Block b) {
 
-		World world = b.getWorld();
-		
-		if(b.getType() != Material.LOG) return false;
-		
-		MinecraftTree tree = d.lastTree();
-		if(tree == null) {
-			tree = new MinecraftTree(b);
-			d.lastTree(tree);
-		}
-		else {
-			tree.refresh(world);
-			if(tree.isInTrunk(b) == false) {
-				tree = new MinecraftTree(b);
-				d.lastTree(tree);
-			}
-		}
-			
-		if(tree.isNatural() == false) return false;
+		MinecraftTree tree = MinecraftTree.getInstance(world, block, data);			
+		if(!tree.isNatural()) return;
 	
-		if (d.silent() == false) { 
-			String message;
-			switch(random.nextInt(100)) {
-				case 0: message = "Chop it like its hot"; break;
-				case 1: message = "Do you feel the magic?"; break;
-				case 2: message = "So easy..."; break;
-				case 3: message = "Comfortably collecting wood yeah!"; break;
-				case 4: message = "Be gone tree"; break;
-				case 5: message = "May the axe be with you"; break;
-				case 6: message = "Who needs an axe if you've got hands?"; break;
-				case 7: message = "Who needs a hammer if you've got a workbe.. wait what?"; break;
-				default: message = null;
+		if (data.silent() == false) {
+			if (random.nextInt(8) > 0) {
+				String message = getRandomMessage();
+				Message.send(player, message);
 			}
-			if(message != null) Message.send(p, message);
 		}
 		
 		if(LumberjackConfiguration.breakFull()) {
 			Block highest;
 			while((highest = tree.removeTrunkTop()) != null) {
-				if(b.getLocation().equals(highest.getLocation())) {
+				if(block.getLocation().equals(highest.getLocation())) {
 					continue;
 				}
-				fakeBlockBreak(highest, p);
+				fakeBlockBreak(highest, player, block.getLocation());
 			}
-			return false; // don't cancel the event
 		}
 		else {
 			Block highest = tree.removeTrunkTop();
 			
 			// no more blocks in tree
-			if(highest == null) return false;
-			if(b.getLocation().equals(highest.getLocation())) {
-				return false; // don't cancel, natural flow
+			if(highest == null) return;
+			if(block.getLocation().equals(highest.getLocation())) {
+				return;
 			}
-			fakeBlockBreak(highest, p);
-		}
-		
-		return true; // cancel the breaking of the current block
+			fakeBlockBreak(highest, player, block.getLocation());
+			event.setCancelled(true);
+		}		
 	}
 	
-	private boolean fakeBlockBreak(Block block, Player player) {
+	private String getRandomMessage() {
+		switch(random.nextInt(7)) {
+			case 0: return "Chop it like its hot";
+			case 1: return "Do you feel the magic?";
+			case 2: return "So easy...";
+			case 3: return "Comfortably collecting wood yeah!";
+			case 4: return "Be gone tree";
+			case 5: return "May the axe be with you";
+			case 6: return "Who needs an axe if you've got hands?";
+			default: return "Who needs a hammer if you've got a workbe.. wait what?";
+		}
+	}
+	
+	private boolean fakeBlockBreak(Block block, Player player, Location breakLocation) {
 
 		BlockBreakEvent break_event = new LumberjackBlockBreakEvent(block, player);
 		Plugin.manager.callEvent(break_event);
@@ -117,17 +103,26 @@ public class OnPlayerHit implements Listener {
 		
 		// reduce durability
 		ItemStack item_in_hand = player.getItemInHand();
-		short dur = (short) (item_in_hand.getDurability() + 1);
-		item_in_hand.setDurability((short) dur);
-		//Message.send(player, "new dur: " + dur); // TODO: remove need to break item when dur = ???
-
-		// artificial item drop
+		int enchantmentLevel = 0;
+		if (item_in_hand.containsEnchantment(Enchantment.DURABILITY)) {
+			enchantmentLevel = item_in_hand.getEnchantmentLevel(Enchantment.DURABILITY);
+		}
+		
+		if (random.nextInt(enchantmentLevel + 1) == 0) {
+			short dur = (short) (item_in_hand.getDurability() + 1);
+			item_in_hand.setDurability((short) dur);			
+		}
+		
+		// drop item between player and wood
 		Material material = block.getType();
 		int amount = 1;
-		byte data = block.getData();
+		byte data = (byte) (3 & block.getData());
 		short damage = 0;
-		ItemStack drop = new ItemStack(material, amount, damage, data);
-		block.getWorld().dropItemNaturally(block.getLocation(), drop);
+		ItemStack dropItem = new ItemStack(material, amount, damage, data);
+		Location playerLocation = player.getLocation();
+		Location dropLocation = playerLocation.add(breakLocation).multiply(0.5);
+		dropLocation.setY(breakLocation.getY());
+		block.getWorld().dropItemNaturally(dropLocation, dropItem);
 		
 		// destroy highest block
 		block.setData((byte)0);
@@ -135,5 +130,4 @@ public class OnPlayerHit implements Listener {
 		
 		return true;
 	}
-
 }
