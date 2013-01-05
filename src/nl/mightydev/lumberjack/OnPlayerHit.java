@@ -96,7 +96,7 @@ public class OnPlayerHit implements Listener {
 		}
 	}
 	
-	private boolean fakeBlockBreak(Block block, Player player, Location dropLocation) {
+	private boolean fakeBlockBreak(Block block, Player player, Location breakLocation) {
 
 		BlockBreakEvent break_event = new LumberjackBlockBreakEvent(block, player);
 		Plugin.manager.callEvent(break_event);
@@ -114,12 +114,14 @@ public class OnPlayerHit implements Listener {
 			item_in_hand.setDurability((short) dur);			
 		}
 		
-		// artificial item drop
+		// drop item between player and wood
 		Material material = block.getType();
 		int amount = 1;
 		byte data = (byte) (3 & block.getData());
 		short damage = 0;
 		ItemStack dropItem = new ItemStack(material, amount, damage, data);
+		Location playerLocation = player.getLocation();
+		Location dropLocation = playerLocation.add(breakLocation).multiply(0.5);
 		block.getWorld().dropItemNaturally(dropLocation, dropItem);
 		
 		// destroy highest block
