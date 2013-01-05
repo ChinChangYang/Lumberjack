@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -103,10 +104,16 @@ public class OnPlayerHit implements Listener {
 		
 		// reduce durability
 		ItemStack item_in_hand = player.getItemInHand();
-		short dur = (short) (item_in_hand.getDurability() + 1);
-		item_in_hand.setDurability((short) dur);
-		//Message.send(player, "new dur: " + dur); // TODO: remove need to break item when dur = ???
-
+		int enchantmentLevel = 0;
+		if (item_in_hand.containsEnchantment(Enchantment.DURABILITY)) {
+			enchantmentLevel = item_in_hand.getEnchantmentLevel(Enchantment.DURABILITY);
+		}
+		
+		if (random.nextInt(enchantmentLevel + 1) == 0) {
+			short dur = (short) (item_in_hand.getDurability() + 1);
+			item_in_hand.setDurability((short) dur);			
+		}
+		
 		// artificial item drop
 		Material material = block.getType();
 		int amount = 1;
