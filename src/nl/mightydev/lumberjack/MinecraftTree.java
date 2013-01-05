@@ -4,11 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import nl.mightydev.lumberjack.player_data.PlayerData;
+
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
 public class MinecraftTree {
+	
+	public static MinecraftTree getInstance(World world, Block b, PlayerData d) {		
+		MinecraftTree tree = d.lastTree();
+		if(tree == null) {
+			tree = new MinecraftTree(b);
+			d.lastTree(tree);
+		}
+		else {
+			tree.refresh(world);
+			if(tree.isInTrunk(b) == false) {
+				tree = new MinecraftTree(b);
+				d.lastTree(tree);
+			}
+		}
+		
+		return tree;
+	}
 
 	private String type = "undetermined";
 	private boolean natural = true;

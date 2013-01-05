@@ -25,10 +25,14 @@ public class OnPlayerHit implements Listener {
 
 	@EventHandler
 	public void onBlockBreak(BlockBreakEvent event) {
-		if(event.isCancelled()) return;
 		
-		if(event instanceof LumberjackBlockBreakEvent) return;
+		Block block = event.getBlock();
+		
+		if(event.isCancelled()) return;		
+		if(event instanceof LumberjackBlockBreakEvent) return;		
+		if(block.getType() != Material.LOG) return;	
 
+		// mcMMO support
 		if(Plugin.manager.isPluginEnabled("mcMMO") && LumberjackConfiguration.mcMMOCheck()) {
 			try {
 				ClassLoader cl = Plugin.manager.getPlugin("mcMMO").getClass().getClassLoader();
@@ -39,50 +43,41 @@ public class OnPlayerHit implements Listener {
 			}
 		}
 		
-		Player p = event.getPlayer();
-		PlayerData d = PlayerData.get(p);
+		Player player = event.getPlayer();
+		PlayerData data = PlayerData.get(player);
 		
-		if(p.getGameMode() == GameMode.SURVIVAL && d.enabled()) {
-			boolean cancel = doActions(p, d, event.getBlock());
+		if(player.getGameMode() == GameMode.SURVIVAL && data.enabled()) {
+			
+			boolean cancel = doActions(player, data, block);
 			event.setCancelled(cancel);
+		}
+	}
+	
+	private String getRandomMessage() {
+		switch(random.nextInt(7)) {
+			case 0: return "Chop it like its hot";
+			case 1: return "Do you feel the magic?";
+			case 2: return "So easy...";
+			case 3: return "Comfortably collecting wood yeah!";
+			case 4: return "Be gone tree";
+			case 5: return "May the axe be with you";
+			case 6: return "Who needs an axe if you've got hands?";
+			default: return "Who needs a hammer if you've got a workbe.. wait what?";
 		}
 	}
 	
 	private boolean doActions(Player p, PlayerData d, Block b) {
 
 		World world = b.getWorld();
-		
-		if(b.getType() != Material.LOG) return false;
-		
-		MinecraftTree tree = d.lastTree();
-		if(tree == null) {
-			tree = new MinecraftTree(b);
-			d.lastTree(tree);
-		}
-		else {
-			tree.refresh(world);
-			if(tree.isInTrunk(b) == false) {
-				tree = new MinecraftTree(b);
-				d.lastTree(tree);
-			}
-		}
+		MinecraftTree tree = MinecraftTree.getInstance(world, b, d); 
 			
 		if(tree.isNatural() == false) return false;
 	
-		if (d.silent() == false) { 
-			String message;
-			switch(random.nextInt(100)) {
-				case 0: message = "Chop it like its hot"; break;
-				case 1: message = "Do you feel the magic?"; break;
-				case 2: message = "So easy..."; break;
-				case 3: message = "Comfortably collecting wood yeah!"; break;
-				case 4: message = "Be gone tree"; break;
-				case 5: message = "May the axe be with you"; break;
-				case 6: message = "Who needs an axe if you've got hands?"; break;
-				case 7: message = "Who needs a hammer if you've got a workbe.. wait what?"; break;
-				default: message = null;
+		if (d.silent() == false) {
+			if (random.nextInt(8) > 0) {
+				String message = getRandomMessage();
+				Message.send(p, message);
 			}
-			if(message != null) Message.send(p, message);
 		}
 		
 		if(LumberjackConfiguration.breakFull()) {
