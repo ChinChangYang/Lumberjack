@@ -103,6 +103,9 @@ public class OnPlayerHit implements Listener {
 		BlockBreakEvent break_event = new LumberjackBlockBreakEvent(block, player);
 		Plugin.manager.callEvent(break_event);
 		if(break_event.isCancelled()) return false;
+
+		Material material = block.getType();
+		Message.send(player, "block#2 type: " + block.getType().toString()); // debug
 		
 		// reduce durability
 		ItemStack item_in_hand = player.getItemInHand();
@@ -117,7 +120,6 @@ public class OnPlayerHit implements Listener {
 		}
 		
 		// drop item between player and wood
-		Material material = block.getType();
 		int amount = 1;
 		byte data = (byte) (3 & block.getData());
 		short damage = 0;
@@ -126,7 +128,6 @@ public class OnPlayerHit implements Listener {
 		Location dropLocation = playerLocation.add(breakLocation).multiply(0.5);
 		dropLocation.setY(breakLocation.getY());
 		
-		Message.send(player, "block#2 type: " + block.getType().toString()); // debug
 		Message.send(player, "dropItem type: " + dropItem.getType().toString()); // debug
 		block.getWorld().dropItemNaturally(dropLocation, dropItem);
 		
