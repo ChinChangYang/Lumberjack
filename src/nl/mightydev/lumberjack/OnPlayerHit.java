@@ -78,9 +78,8 @@ public class OnPlayerHit implements Listener {
 				return;
 			}
 			fakeBlockBreak(highest, player, block.getLocation());
-		}
-		
-		event.setCancelled(true);
+			event.setCancelled(true);
+		}		
 	}
 	
 	private String getRandomMessage() {
@@ -122,6 +121,7 @@ public class OnPlayerHit implements Listener {
 		ItemStack dropItem = new ItemStack(material, amount, damage, data);
 		Location playerLocation = player.getLocation();
 		Location dropLocation = playerLocation.add(breakLocation).multiply(0.5);
+		dropLocation.setY(breakLocation.getY());
 		block.getWorld().dropItemNaturally(dropLocation, dropItem);
 		
 		// destroy highest block
