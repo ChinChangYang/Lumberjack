@@ -97,12 +97,13 @@ public class OnPlayerHit implements Listener {
 		}
 	}
 	
-	private boolean fakeBlockBreak(Block block, Player player, Location breakLocation) {
+	private void fakeBlockBreak(Block block, Player player, Location breakLocation) {
 
 		Message.send(player, "block#1 type: " + block.getType().toString()); // debug
 		BlockBreakEvent break_event = new LumberjackBlockBreakEvent(block, player);
 		Plugin.manager.callEvent(break_event);
-		if(break_event.isCancelled()) return false;
+		if(break_event.isCancelled()) return;
+		if(!block.getType().equals(Material.LOG)) return;
 
 		Material material = block.getType();
 		Message.send(player, "block#2 type: " + block.getType().toString()); // debug
@@ -135,6 +136,6 @@ public class OnPlayerHit implements Listener {
 		block.setData((byte)0);
 		block.setType(Material.AIR);
 		
-		return true;
+		return;
 	}
 }
