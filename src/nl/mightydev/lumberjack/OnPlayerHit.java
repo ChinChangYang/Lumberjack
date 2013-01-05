@@ -77,6 +77,8 @@ public class OnPlayerHit implements Listener {
 			}
 			fakeBlockBreak(highest, player);
 		}
+		
+		event.setCancelled(true);
 	}
 	
 	private String getRandomMessage() {
