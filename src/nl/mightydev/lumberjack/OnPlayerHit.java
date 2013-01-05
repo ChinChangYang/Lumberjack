@@ -79,6 +79,12 @@ public class OnPlayerHit implements Listener {
 			}
 			
 			Message.send(player, "Highest type: " + highest.getType().toString()); // debug
+			
+			BlockBreakEvent break_event = new LumberjackBlockBreakEvent(block, player);
+			Plugin.manager.callEvent(break_event);
+			if(break_event.isCancelled()) return;
+			if(!block.getType().equals(Material.LOG)) return;
+			
 			fakeBlockBreak(highest, player, block.getLocation());
 			event.setCancelled(true);
 		}		
@@ -99,15 +105,9 @@ public class OnPlayerHit implements Listener {
 	
 	private void fakeBlockBreak(Block block, Player player, Location breakLocation) {
 
-		Message.send(player, "block#1 type: " + block.getType().toString()); // debug
-		BlockBreakEvent break_event = new LumberjackBlockBreakEvent(block, player);
-		Plugin.manager.callEvent(break_event);
-		if(break_event.isCancelled()) return;
-		if(!block.getType().equals(Material.LOG)) return;
-
+		Message.send(player, "block type: " + block.getType().toString()); // debug
 		Material material = block.getType();
-		Message.send(player, "block#2 type: " + block.getType().toString()); // debug
-		
+
 		// reduce durability
 		ItemStack item_in_hand = player.getItemInHand();
 		int enchantmentLevel = 0;
