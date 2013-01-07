@@ -1,4 +1,4 @@
-todo what
+todo
 
 undo functionality
 chain draw mode
