@@ -1,0 +1,8 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Source code
+*.java text
+
+# Library
+*.jar binary
