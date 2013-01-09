@@ -94,5 +94,9 @@ public abstract class LumberjackConfiguration {
 		
 	}
 
+	public static void setMcMMO(boolean b) {
+		mcMMO = b;
+	}
+
 
 }
