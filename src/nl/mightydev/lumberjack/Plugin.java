@@ -69,6 +69,7 @@ public class Plugin extends JavaPlugin {
 			return false;
 		}
 		
+		if (!sender.hasPermission(LumberjackPermissions.ALL)) return false;
 		Player player = (Player) sender;
 		PlayerData data = PlayerData.get(player);
 		
