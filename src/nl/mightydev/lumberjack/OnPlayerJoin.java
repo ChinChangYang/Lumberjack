@@ -19,7 +19,7 @@ public class OnPlayerJoin implements Listener {
 		
 		Player p = event.getPlayer();
 
-		if (!p.hasPermission(LumberjackPermissions.ALL)) return;
+		if (!LumberjackPermissions.check(p)) return;
 		if (LumberjackConfiguration.showLoginMessage() == false)
 			return;
 

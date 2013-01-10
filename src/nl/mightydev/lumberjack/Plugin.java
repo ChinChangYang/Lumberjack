@@ -52,7 +52,6 @@ public class Plugin extends JavaPlugin {
 		LumberjackConfiguration.load();
 		LumberjackConfiguration.write();
 		PlayerData.load();
-
 	}
 
 	public void onDisable() {
@@ -84,36 +83,36 @@ public class Plugin extends JavaPlugin {
 			String c = arguments[i++];
 
 			if (c.equals("enable") || c.equals("e")) {
-				if (sender.hasPermission(LumberjackPermissions.ALL)) {
+				if (LumberjackPermissions.check(sender)) {
 					data.enabled(true);
 					Message.send(player, Message.good("enabled"));
 					PlayerData.store();
 				} else {
-					Message.send(player, Message.bad("no permissions"));
+					Message.send(player, Message.bad("You have no permissions"));
 				}
 			} else if (c.equals("disable") || c.equals("d")) {
-				if (sender.hasPermission(LumberjackPermissions.ALL)) {
+				if (LumberjackPermissions.check(sender)) {
 					data.enabled(false);
-					Message.send(player, Message.bad("disabled"));
+					Message.send(player, Message.good("disabled"));
 					PlayerData.store();
 				} else {
-					Message.send(player, Message.bad("no permissions"));
+					Message.send(player, Message.bad("You have no permissions"));
 				}
 			} else if (c.equals("silent") || c.equals("s")) {
-				if (sender.hasPermission(LumberjackPermissions.ALL)) {
+				if (LumberjackPermissions.check(sender)) {
 					data.silent(true);
 					Message.send(player, "Reduced number of messages");
 					PlayerData.store();
 				} else {
-					Message.send(player, Message.bad("no permissions"));
+					Message.send(player, Message.bad("You have no permissions"));
 				}
 			} else if (c.equals("normal") || c.equals("n")) {
-				if (sender.hasPermission(LumberjackPermissions.ALL)) {
+				if (LumberjackPermissions.check(sender)) {
 					data.silent(false);
 					Message.send(player, "Normal number of messages");
 					PlayerData.store();
 				} else {
-					Message.send(player, Message.bad("no permissions"));
+					Message.send(player, Message.bad("You have no permissions"));
 				}
 			} else {
 				Message.sendError(player, "Unknown " + Plugin.name
