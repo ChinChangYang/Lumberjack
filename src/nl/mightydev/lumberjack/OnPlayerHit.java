@@ -34,10 +34,11 @@ public class OnPlayerHit implements Listener {
 		World world = block.getWorld();
 		
 		if(event.isCancelled()) return;		
-		if(event instanceof LumberjackBlockBreakEvent) return;		
-		if(block.getType() != Material.LOG) return;	
+		if(event instanceof LumberjackBlockBreakEvent) return;
 		if(player.getGameMode() != GameMode.SURVIVAL) return;
-		if(!data.enabled()) return;
+		if(!player.hasPermission(LumberjackPermissions.ALL)) return;
+		if(!data.enabled()) return;		
+		if(block.getType() != Material.LOG) return;	
 
 		// mcMMO support
 		if(Plugin.manager.isPluginEnabled("mcMMO") && LumberjackConfiguration.mcMMOCheck()) {
