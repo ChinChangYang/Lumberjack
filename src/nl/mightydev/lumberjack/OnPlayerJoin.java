@@ -16,11 +16,13 @@ public class OnPlayerJoin implements Listener {
 	@EventHandler
 	public void onPlayerJoin(
 			PlayerJoinEvent event) {
+		
+		Player p = event.getPlayer();
 
+		if (!p.hasPermission(LumberjackPermissions.ALL)) return;
 		if (LumberjackConfiguration.showLoginMessage() == false)
 			return;
 
-		Player p = event.getPlayer();
 		PlayerData d = PlayerData.get(p);
 
 		String s = d.enabled() ? Message.good("enabled") : Message
