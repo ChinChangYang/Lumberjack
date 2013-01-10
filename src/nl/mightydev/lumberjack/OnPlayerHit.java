@@ -36,7 +36,7 @@ public class OnPlayerHit implements Listener {
 		if(event.isCancelled()) return;		
 		if(event instanceof LumberjackBlockBreakEvent) return;
 		if(player.getGameMode() != GameMode.SURVIVAL) return;
-		if(!player.hasPermission(LumberjackPermissions.ALL)) return;
+		if(!LumberjackPermissions.check(player)) return;
 		if(!data.enabled()) return;		
 		if(block.getType() != Material.LOG) return;	
 
