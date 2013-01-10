@@ -18,89 +18,111 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Plugin extends JavaPlugin {
 
 	public static String name = "Lumberjack";
-	public static LumberjackVersion version = null; 
+	public static LumberjackVersion version = null;
 	public static PluginManager manager = null;
 	public static String directory = null;
 	public static String configuration_filepath;
 	public static String player_settings_filepath;
-	
+
 	public void onEnable() {
-		
+
 		PluginDescriptionFile d = getDescription();
 		Plugin.name = d.getName();
 		Plugin.version = new LumberjackVersion(d.getVersion());
-		
+
 		PluginMessage.initialize(Plugin.name);
 		PluginMessage.send("version " + Plugin.version + " enabled!");
-		
+
 		manager = this.getServer().getPluginManager();
-		
+
 		manager.registerEvents(OnPlayerHit.instance, this);
 		manager.registerEvents(OnPlayerJoin.instance, this);
-		
+
 		File data_folder = getDataFolder();
-		
-		if(data_folder.exists() == false) {
+
+		if (data_folder.exists() == false) {
 			data_folder.mkdirs();
 		}
-		
+
 		Plugin.directory = data_folder.getPath() + "/";
 		Plugin.configuration_filepath = Plugin.directory + "lumberjack.config";
-		Plugin.player_settings_filepath = Plugin.directory + "lumberjack.player.settings";
-		
+		Plugin.player_settings_filepath = Plugin.directory
+				+ "lumberjack.player.settings";
+
 		LumberjackConfiguration.load();
 		LumberjackConfiguration.write();
 		PlayerData.load();
-		
+
 	}
-	
+
 	public void onDisable() {
+
 		PluginMessage.send("disabled");
 	}
-	
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] arguments) {
-		if(!(sender instanceof Player)) {
+
+	public boolean onCommand(
+			CommandSender sender,
+			Command command,
+			String label,
+			String[] arguments) {
+
+		if (!(sender instanceof Player)) {
 			sender.sendMessage("this command can only be run by a player");
 			return false;
 		}
-		
-		if(arguments.length == 0) {
+
+		if (arguments.length == 0) {
 			sender.sendMessage("this command requires at least 1 argument");
 			return false;
 		}
-		
-		if (!sender.hasPermission(LumberjackPermissions.ALL)) return false;
+
 		Player player = (Player) sender;
 		PlayerData data = PlayerData.get(player);
-		
+
 		int i = 0;
-		while(i < arguments.length) {
+		while (i < arguments.length) {
 			String c = arguments[i++];
-			
-			if(c.equals("enable") || c.equals("e")) {
-				data.enabled(true);
-				Message.send(player, Message.good("enabled"));
-			}
-			else if(c.equals("disable") || c.equals("d")) {
-				data.enabled(false);
-				Message.send(player, Message.bad("disabled"));
-			}
-			else if(c.equals("silent") || c.equals("s")) {
-				data.silent(true);
-				Message.send(player, "Reduced number of messages");
-			}
-			else if(c.equals("normal") || c.equals("n")) {
-				data.silent(false);
-				Message.send(player, "Normal number of messages");
-			}
-			else {
-				Message.sendError(player, "Unknown " + Plugin.name + " command " + Message.strong(c));
+
+			if (c.equals("enable") || c.equals("e")) {
+				if (sender.hasPermission(LumberjackPermissions.ALL)) {
+					data.enabled(true);
+					Message.send(player, Message.good("enabled"));
+					PlayerData.store();
+				} else {
+					Message.send(player, Message.bad("no permissions"));
+				}
+			} else if (c.equals("disable") || c.equals("d")) {
+				if (sender.hasPermission(LumberjackPermissions.ALL)) {
+					data.enabled(false);
+					Message.send(player, Message.bad("disabled"));
+					PlayerData.store();
+				} else {
+					Message.send(player, Message.bad("no permissions"));
+				}
+			} else if (c.equals("silent") || c.equals("s")) {
+				if (sender.hasPermission(LumberjackPermissions.ALL)) {
+					data.silent(true);
+					Message.send(player, "Reduced number of messages");
+					PlayerData.store();
+				} else {
+					Message.send(player, Message.bad("no permissions"));
+				}
+			} else if (c.equals("normal") || c.equals("n")) {
+				if (sender.hasPermission(LumberjackPermissions.ALL)) {
+					data.silent(false);
+					Message.send(player, "Normal number of messages");
+					PlayerData.store();
+				} else {
+					Message.send(player, Message.bad("no permissions"));
+				}
+			} else {
+				Message.sendError(player, "Unknown " + Plugin.name
+						+ " command " + Message.strong(c));
+				
 				return false;
 			}
 		}
-		
-		PlayerData.store();
-		
+
 		return true;
 	}
 
