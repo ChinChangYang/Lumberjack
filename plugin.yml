@@ -1,6 +1,6 @@
 name: Lumberjack
 main: nl.mightydev.lumberjack.Plugin
-version: CCY-0.99.2
+version: CCY-0.99.3
 authors: [deazurain, CCY]
 website: https://github.com/ChinChangYang/Lumberjack
 description: A plugin to chop down big trees without having to climb them.
