@@ -114,6 +114,9 @@ public class MinecraftTree {
 			type = "birch";
 			completeBirchTree(source);
 			break;
+		case 3:
+			type = "jungle";
+			completeJungleTree(source);
 		}
 		
 		if(natural == false) return;
@@ -144,7 +147,7 @@ public class MinecraftTree {
 			return;
 		}
 	}
-	
+
 	private void completeOakTree(Block source) {
 		if(!natural) return;
 		
@@ -192,6 +195,10 @@ public class MinecraftTree {
 	private void completeRedwoodTree(Block source){
 		completeBirchTree(source);
 	}
+	
+	private void completeJungleTree(Block source) {
+		completeOakTree(source);		
+	}
 
 	
 	/**
@@ -238,14 +245,16 @@ public class MinecraftTree {
 	
 	private boolean isNaturalLeaf(Block leaf) {
 		/*
-		byte d = leaf.getData();
-		boolean b4 = (d & (1<<0)) != 0;
-		boolean b3 = (d & (1<<1)) != 0;
-		boolean b2 = (d & (1<<2)) != 0;
-		boolean b1 = (d & (1<<3)) != 0;
-		String s = (b1?"1":"0") + (b2?"1":"0") + (b3?"1":"0") + (b4?"1":"0");
-		Logger.getLogger("Minecraft").info("isNatur " + (int) leaf.getData() + ": " + s);*/
-		// 'placed' bit is the third bit in the block data if the bits are arranged like this: 4321
+		 * If bit 0x4 is set, the leaves are permanent and will never decay.
+		 * This bit is set on player-placed leaf blocks and overrides the
+		 * meaning of bit 0x8.
+		 * 
+		 * If bit 0x8 is set, the leaves will be checked for decay. The bit will
+		 * be cleared after the check if the leaves do not decay. The bit will
+		 * be set again whenever a block adjacent to the leaves is changed.
+		 * 
+		 * Reference: http://www.minecraftwiki.net/wiki/Data_values#Leaves
+		 */
 		return (leaf.getData() & (1<<2)) == 0; 
 	}
 
