@@ -8,7 +8,7 @@ Latest release version: https://github.com/ChinChangYang/Lumberjack/tree/master/
 * Lumberjack is a plugin of craftBukkit, which is a Minecraft server implementation.
 * Lumberjack adds an extensive experience for lumbering woods.
 * Lumberjack can let trees be felled when a player breaks a wood block that is part of a tree.
-* Lumberjack now works for oak, birch, redwood, jungle trees.
+* Lumberjack now works for oak, birch, redwood, and jungle trees.
 
 ### Permissions
 * Permission node: "lumberjack.all"
