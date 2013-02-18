@@ -1,4 +1,11 @@
 CHANGELOG
 
+Version CCY-1.0.0
+ = Jungle trees supported
+ = PermissionsBukkit Supported
+
+Version CCY-0.99.1
+ = PermissionsEx supported
+
 Version 1.8.1v6-CCY-1.4.2-R7 
  = No more mcMMO-related exception spam
