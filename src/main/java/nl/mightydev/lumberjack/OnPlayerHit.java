@@ -36,7 +36,7 @@ public class OnPlayerHit implements Listener {
 		if(player.getGameMode() != GameMode.SURVIVAL) return;
 		if(!LumberjackPermissions.check(player)) return;
 		if(!data.enabled()) return;		
-		if(block.getType() != Material.LOG) return;	
+		if(block.getType() != Material.LOG && block.getType() != Material.LOG_2) return;	
 
 		// mcMMO support
 		if(Plugin.manager.isPluginEnabled("mcMMO") && LumberjackConfiguration.mcMMOCheck()) {
@@ -82,7 +82,7 @@ public class OnPlayerHit implements Listener {
 			BlockBreakEvent break_event = new LumberjackBlockBreakEvent(block, player);
 			Plugin.manager.callEvent(break_event);
 			if(break_event.isCancelled()) return;
-			if(!block.getType().equals(Material.LOG)) return;
+			if(!block.getType().equals(Material.LOG) && !block.getType().equals(Material.LOG_2)) return;
 			
 			fakeBlockBreak(highest, player, block.getLocation());
 			event.setCancelled(true);
